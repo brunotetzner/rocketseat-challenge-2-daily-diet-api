@@ -41,10 +41,10 @@ export async function userRoutes(app: FastifyInstance) {
   app.delete("/:id", async (request, reply) => {
     let { sessionId } = request.cookies;
 
-    const getTransactionParamSchema = z.object({
+    const getUserParamSchema = z.object({
       id: z.string().uuid(),
     });
-    const { id } = getTransactionParamSchema.parse(request.params);
+    const { id } = getUserParamSchema.parse(request.params);
 
     const user = await knex("users")
       .where({ session_id: sessionId, id })
@@ -68,7 +68,6 @@ export async function userRoutes(app: FastifyInstance) {
   });
   app.get("/me/scores", async (request, reply) => {
     const { sessionId } = request.cookies;
-    //  get the user`s number of meals, number of meals inside the diet and outside the diet and Best meal sequence within the diet.
 
     const user = await knex("users").where({ session_id: sessionId }).first();
     const meals = await knex("meals").where({ userId: user?.id });
@@ -96,18 +95,18 @@ export async function userRoutes(app: FastifyInstance) {
     return { numberOfHealthyFood, numberOfNotHealthyFood, maxHealthyMeals };
   });
   app.put("/:id", async (request, reply) => {
-    const createUserBodySchema = z.object({
+    const editUserBodySchema = z.object({
       name: z.string().max(100).optional(),
       bornAt: z.string().optional(),
     });
 
     let { sessionId } = request.cookies;
-    let { name, bornAt } = createUserBodySchema.parse(request.body);
+    let { name, bornAt } = editUserBodySchema.parse(request.body);
 
-    const getTransactionParamSchema = z.object({
+    const getUserParamSchema = z.object({
       id: z.string().uuid(),
     });
-    const { id } = getTransactionParamSchema.parse(request.params);
+    const { id } = getUserParamSchema.parse(request.params);
 
     if (bornAt) {
       bornAt = new Date(bornAt).toISOString();
