@@ -27,6 +27,7 @@
     "@fastify/cookie": "^9.0.4",
     "dotenv": "^16.3.1",
     "fastify": "^4.22.2",
+    "fastify-cookie": "^5.7.0",
     "knex": "^2.5.1",
     "pg": "^8.11.3",
     "vitest": "^0.34.3",
