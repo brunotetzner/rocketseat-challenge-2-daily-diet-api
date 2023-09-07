@@ -2,6 +2,8 @@ import { randomUUID } from "crypto";
 import { FastifyInstance } from "fastify";
 import { knex } from "../database";
 import { z } from "zod";
+import { parseISO, isBefore } from "date-fns";
+import { compareDates } from "../utils";
 
 export async function userRoutes(app: FastifyInstance) {
   app.post("/", async (request, reply) => {
@@ -64,7 +66,35 @@ export async function userRoutes(app: FastifyInstance) {
 
     return user || reply.code(404).send();
   });
+  app.get("/me/scores", async (request, reply) => {
+    const { sessionId } = request.cookies;
+    //  get the user`s number of meals, number of meals inside the diet and outside the diet and Best meal sequence within the diet.
 
+    const user = await knex("users").where({ session_id: sessionId }).first();
+    const meals = await knex("meals").where({ userId: user?.id });
+
+    const numberOfHealthyFood = meals.filter(
+      (meal) => meal.withinTheDiet
+    ).length;
+    const numberOfNotHealthyFood = meals.filter(
+      (meal) => !meal.withinTheDiet
+    ).length;
+
+    const orderedMeals = meals.sort(compareDates);
+
+    let maxHealthyMeals = 0;
+    let currentHealthyMeals = 0;
+    for (let i = 0; i < orderedMeals.length; i++) {
+      if (orderedMeals[i].withinTheDiet) {
+        currentHealthyMeals += 1;
+      } else currentHealthyMeals = 0;
+      if (currentHealthyMeals > maxHealthyMeals) {
+        maxHealthyMeals = currentHealthyMeals;
+      }
+    }
+
+    return { numberOfHealthyFood, numberOfNotHealthyFood, maxHealthyMeals };
+  });
   app.put("/:id", async (request, reply) => {
     const createUserBodySchema = z.object({
       name: z.string().max(100).optional(),

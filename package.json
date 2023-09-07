@@ -25,6 +25,7 @@
   "homepage": "https://github.com/brunotetzner/rocketseat-challenge-2-daily-diet-api#readme",
   "dependencies": {
     "@fastify/cookie": "^9.0.4",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.22.2",
     "fastify-cookie": "^5.7.0",
